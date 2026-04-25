@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cosmic-bg: #030014;
+  --color-cosmic-card: rgba(6, 6, 20, 0.8);
+  --color-neon-cyan: #00f3ff;
+  --color-neon-purple: #9d00ff;
+  --color-neon-pink: #ff00c1;
+  --color-neon-blue: #0066ff;
+  
+  --font-orbitron: "Orbitron", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  
+  --shadow-neon-cyan: 0 0 15px rgba(0, 243, 255, 0.4), 0 0 30px rgba(0, 243, 255, 0.2);
+  --shadow-neon-purple: 0 0 15px rgba(157, 0, 255, 0.4), 0 0 30px rgba(157, 0, 255, 0.2);
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-cosmic-bg text-gray-100 font-inter antialiased overflow-x-hidden;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-orbitron tracking-widest uppercase;
+  }
+
+  /* Custom Scrollbar for Sci-Fi feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-cosmic-bg;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neon-cyan/20 rounded-full hover:bg-neon-cyan/40 transition-colors;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-cosmic-card backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl;
+  }
+  
+  .neon-border-cyan {
+    @apply border-neon-cyan/30 shadow-neon-cyan;
+  }
+  
+  .neon-text-cyan {
+    @apply text-neon-cyan drop-shadow-[0_0_8px_rgba(0,243,255,0.8)];
+  }
+
+  .interactive-button {
+    @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95;
+  }
+}
+
+canvas {
+  touch-action: none;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
