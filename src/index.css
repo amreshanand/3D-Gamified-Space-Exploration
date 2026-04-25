@@ -2,7 +2,7 @@
 
 @theme {
   --color-cosmic-bg: #030014;
-  --color-cosmic-card: rgba(6, 6, 20, 0.8);
+  --color-cosmic-card: rgba(6, 6, 24, 0.7);
   --color-neon-cyan: #00f3ff;
   --color-neon-purple: #9d00ff;
   --color-neon-pink: #ff00c1;
@@ -16,6 +16,7 @@
   
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  --animate-scanning: scanning 8s linear infinite;
   
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -26,11 +27,16 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
   }
+
+  @keyframes scanning {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
 }
 
 @layer base {
   body {
-    @apply bg-cosmic-bg text-gray-100 font-inter antialiased overflow-x-hidden;
+    @apply bg-cosmic-bg text-gray-100 font-inter antialiased overflow-hidden;
     margin: 0;
     min-height: 100vh;
   }
@@ -39,33 +45,56 @@
     @apply font-orbitron tracking-widest uppercase;
   }
 
-  /* Custom Scrollbar for Sci-Fi feel */
+  /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-cosmic-bg;
+    @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-neon-cyan/20 rounded-full hover:bg-neon-cyan/40 transition-colors;
+    @apply bg-neon-cyan/30 rounded-full hover:bg-neon-cyan/60 transition-all;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-cosmic-card backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl;
+    @apply bg-cosmic-card backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.5)];
+    background-image: 
+      linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-blend-mode: overlay;
   }
   
   .neon-border-cyan {
-    @apply border-neon-cyan/30 shadow-neon-cyan;
+    @apply border-neon-cyan/50 shadow-[0_0_15px_rgba(0,243,255,0.3)];
   }
   
   .neon-text-cyan {
-    @apply text-neon-cyan drop-shadow-[0_0_8px_rgba(0,243,255,0.8)];
+    @apply text-neon-cyan drop-shadow-[0_0_10px_rgba(0,243,255,0.8)];
   }
 
   .interactive-button {
-    @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer;
+  }
+
+  .tech-accent {
+    @apply absolute w-2 h-2 border-t-2 border-l-2 border-neon-cyan;
+  }
+
+  .scanline {
+    @apply fixed inset-0 pointer-events-none z-[100] opacity-5;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 243, 255, 0.2) 50%
+    );
+    background-size: 100% 4px;
+  }
+
+  .noise-overlay {
+    @apply fixed inset-0 pointer-events-none z-[101] opacity-[0.03];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 }
 

@@ -65,14 +65,14 @@ const OrbitPath = ({ radius }) => {
 };
 
 const Planet = ({ id, name, position, size, color, description, isSelected, onSelect }) => {
-  const { isPlanetLocked } = useGameStore();
+  const { isPlanetLocked, planetGates } = useGameStore();
   const locked = isPlanetLocked(id);
   const [hovered, setHovered] = useState(false);
   const meshRef = useRef();
 
   return (
     <group position={position}>
-      <Float speed={locked ? 0.5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
+      <Float speed={locked ? 0.3 : 1.5} rotationIntensity={0.5} floatIntensity={0.5}>
         <mesh 
           ref={meshRef}
           onPointerDown={(e) => {
@@ -81,53 +81,65 @@ const Planet = ({ id, name, position, size, color, description, isSelected, onSe
           }}
           onPointerOver={() => !locked && setHovered(true)}
           onPointerOut={() => setHovered(false)}
-          cursor={locked ? 'not-allowed' : 'pointer'}
         >
           <sphereGeometry args={[size, 64, 64]} />
           <meshStandardMaterial 
-            color={locked ? '#333333' : color} 
+            color={locked ? '#1a1a1a' : color} 
             emissive={locked ? '#000000' : color}
-            emissiveIntensity={hovered || isSelected ? 0.8 : 0.2}
-            metalness={0.8}
-            roughness={0.2}
-            transparent
-            opacity={locked ? 0.4 : 1}
+            emissiveIntensity={hovered || isSelected ? 1.2 : 0.4}
+            metalness={0.9}
+            roughness={0.1}
           />
           
           {/* Atmosphere Glow */}
-          <mesh scale={1.15}>
+          <mesh scale={1.2}>
             <sphereGeometry args={[size, 32, 32]} />
-            <meshBasicMaterial color={color} transparent opacity={hovered ? 0.2 : 0.05} side={THREE.BackSide} />
+            <meshBasicMaterial color={color} transparent opacity={hovered ? 0.15 : 0.05} side={THREE.BackSide} />
           </mesh>
+
+          {/* Scanning Ring */}
+          {(hovered || isSelected) && !locked && (
+            <mesh rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[size + 0.2, size + 0.25, 64]} />
+              <meshBasicMaterial color={color} transparent opacity={0.3} />
+            </mesh>
+          )}
         </mesh>
       </Float>
 
       {/* Label */}
-      <Html position={[0, size + 1, 0]} center style={{ pointerEvents: 'none' }}>
-        <div className={`transition-all duration-500 flex flex-col items-center ${hovered || isSelected ? 'opacity-100' : 'opacity-40'}`}>
-          <div className={`font-orbitron text-[10px] tracking-[0.3em] font-black uppercase mb-1 ${locked ? 'text-gray-500' : 'text-neon-cyan'}`}>
-            {locked ? `🔒 ${name}` : name}
-          </div>
-          {(hovered || isSelected) && !locked && (
-            <div className="bg-black/80 border border-white/20 px-3 py-1 rounded-sm text-[8px] text-white whitespace-nowrap">
-              {description}
+      <Html position={[0, size + 1.2, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className={`transition-all duration-700 flex flex-col items-center ${hovered || isSelected ? 'opacity-100 scale-100' : 'opacity-20 scale-90'}`}>
+          <div className="flex items-center space-x-3 mb-2">
+            <div className={`h-[1px] w-8 bg-gradient-to-r from-transparent ${locked ? 'to-gray-500' : 'to-neon-cyan'}`} />
+            <div className={`font-orbitron text-[11px] tracking-[0.4em] font-black uppercase whitespace-nowrap ${locked ? 'text-gray-500' : 'text-white'}`}>
+              {locked ? `Restricted_${id}` : name}
             </div>
+            <div className={`h-[1px] w-8 bg-gradient-to-l from-transparent ${locked ? 'to-gray-500' : 'to-neon-cyan'}`} />
+          </div>
+          
+          {(hovered || isSelected) && !locked && (
+            <motion.div 
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg flex flex-col items-center shadow-2xl"
+            >
+              <div className="text-[8px] text-neon-cyan font-black uppercase tracking-widest mb-1">{description}</div>
+              <div className="text-[7px] text-gray-500 font-mono italic flex items-center space-x-2">
+                <span className="w-1 h-1 bg-neon-cyan rounded-full animate-ping" />
+                <span>Scanning_Sector... OK</span>
+              </div>
+            </motion.div>
           )}
+
           {locked && hovered && (
-            <div className="bg-red-900/80 border border-red-500/50 px-3 py-1 rounded-sm text-[8px] text-white whitespace-nowrap uppercase tracking-tighter">
-              Requires LVL {useGameStore.getState().planetGates[id]}
+            <div className="bg-red-950/80 backdrop-blur-md border border-red-500/30 px-4 py-2 rounded-lg flex items-center space-x-3">
+              <Lock className="w-3 h-3 text-red-500" />
+              <span className="text-[8px] text-white font-black uppercase tracking-wider">Level {useGameStore.getState().planetGates[id]} Required</span>
             </div>
           )}
         </div>
       </Html>
-
-      {/* Selector Ring */}
-      {isSelected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[size + 0.5, size + 0.6, 32]} />
-          <meshBasicMaterial color={color} transparent opacity={0.5} />
-        </mesh>
-      )}
     </group>
   );
 };
